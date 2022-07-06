@@ -1,0 +1,39 @@
+version: "3.1"
+services:
+  db:
+    build: 
+      dockerfile: ./postgres.dockerfile
+      context: ./docker
+    image: ist-db
+    container_name: ist-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: prova
+    ports:
+      - "5432:5432"
+    networks:
+      - ist-network  
+    volumes: 
+      - ./bd/biblioteca.sql:/docker-entrypoint-initdb.d/biblioteca.sql
+      - bd-data:/var/lib/postgresql/data
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "pgadmin@pgadmin.com.br"
+      PGADMIN_DEFAULT_PASSWORD: "pgadmin"
+    ports:
+      - "16543:80"
+    depends_on:
+      - db
+    networks:
+      - ist-network
+      
+networks: 
+  ist-network:
+    driver: bridge
+    
+volumes:
+    bd-data:
